@@ -55,13 +55,13 @@ To solve the minimisation problem, start at a point, find the direction of maxim
 1. **Choose a starting point**. Choose an initial guess of `\theta_0` and `\theta_1`, normally done by randomly guessing.
 2. **Calculate the gradient**. Calculate the gradient of the loss function with respect to an infinitesimal change in your parameters `\theta_0` and `\theta_1`. This will give the direction along which the loss function increases the most:
 
-![](img/grad-descent-1.PNG)
+![](img/grad-descent-1.png)
 
 3. **Update**. Take a small step in the direction of the most negative gradient (largest descent) and update your parameters `\theta_0` and `\theta_1`.
 
-![](img/grad-descent-2.PNG)
+![](img/grad-descent-2.png)
 
-![](img/grad-descent-3.PNG)
+![](img/grad-descent-3.png)
 
 4. **Repeat**. The loss function MSE is quadratic; gradient changes linearly. Therefore, we need to update the gradient at the new point, and repeat steps 1-3 until the variation of the cost function is zero (to *numerical tolerance*) and/or a *maximum number of iterations* is reached. Both of these training parameters are user-defined.
 
