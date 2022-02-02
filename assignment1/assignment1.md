@@ -19,7 +19,7 @@ It should return an updated vector of weights `\theta` and a vector of historica
 
 ## Pseudocode
 
-Since only discussion is allowed and not sharing of code; I'll use psuedocode in Python3 (here for my notes.
+Since only discussion is allowed and not sharing of code; I'll use psuedocode in Python3 here for my notes.
 
 ```python
 import math
