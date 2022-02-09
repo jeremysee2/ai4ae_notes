@@ -13,3 +13,16 @@ This provides a "table of contents" of the exercises in each set of lecture note
 3. One dimensional gradient descent (link provided):
    1. Explain the behaviour of gradient descent with Initial slope = 0.5; Learning rate = 0.14; Batch size = 20; Number of iterations = 25. Suggest strategies to improve convergence.
 4. The mean-squared error can be written in matrix form as `J` = ... Can you find the optimal set of parameters `\theta` without gradient descent?
+
+Assignment 1: Multivariate linear regression in MATLAB.
+
+## Logistic regression (Lecture 3)
+
+1. Entropy gives the average level of information of the outcomes. Which of the following datasets of two classes 1 and 2 has maximum entropy?
+2. Calculate the precision, recall and accuracy.
+
+1. What is the geometric interpretation of the Lagrangian in Eq 26?
+2. Derive the Lagrangian Dual in Eq 28.
+3. Given the polynomial kernel, find `\phi` such that `K` = `\phi_x` . `\phi_y`. Assume that the vectors are two dimensional.
+
+Assignment 2: Kernel trick for SVMs in MATLAB.
