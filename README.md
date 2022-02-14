@@ -313,3 +313,151 @@ For nonlinearly separable data, we apply the kernel function `K` to the inner pr
 High level overview of SVM optimisation with sequential minimal optimisation:
 
 ![](img/lagrangian-dual-4.png)
+
+## Lecture 4 (Feedforward Neural Networks)
+
+Decompositions are used to represent a nonlinear function in simpler terms, such as the Taylor series and Fourier series. Neural networks are ways of decomposing a complicated function into simpler (also nonlinear) functions. They usually use the Activation Function.
+
+### Feedforward neural networks
+
+![](img/neural-networks.png)
+
+The goal of a feedforward neural network is to learn (i.e. approximate) some function `h` such that y ~= h(x, \theta). Information flows from the inputs x, to the outputs y, with no feedback connections. Neural networks take the features x, and manipulate them with these operations:
+
+1. Shift
+2. Rotate
+3. Add up
+4. Deform
+5. Repeat
+
+**Biases** shift, multiplication with **weights** rotates. The **activation function** deforms nonlinearly. By repeating this, we perform a "composition" of functions. This creates a multi-layered neural network that can represent any nonlinear function (in principle). When training, we find the optimal parameters that minimise the error between the prediction and the ground truth.
+
+### Mathematical expression of a neural network
+
+Use vectorised notation to express mathematically the entire neural network. Start with one input layer with N features, plus the bias.
+
+![](img/nn-math-1.png)
+
+where z^1 is the *pre-activation*, which has not undergone the nonlinearity of the activation function.
+b_0^1 is the *bias*.
+a^1 is the *activation*.
+N+1 inputs, with x_0 by definition.
+
+The features are connected to two nodes in the first hidden layer. Therefore, there must be (N+1)\*2 parameters, which means that the weight matrix has dimensions (N+1)\*2. We increase the dimension of the pre-activation by 1 by concatenating the bias b_0^1, so z^1 has dimensions (nodes+1)\*1 = 3\*1. Finally, the activation vector is the element-wise application of the activation function, hence the dimension of a^1 is exactly equal to the dimension of z^1.
+
+![](img/nn-math-2.png)
+
+The three derived features are connected to three nodes; therefore there most be 3x3 parameters, the dimensions of the weights matrix. Just before the action of the activation function, the linear input is 3x1. As before, we increase the dimension of the pre-activation by 1 by concatenating the bias term so dimensions of z^2 is 4x1. Hence dimension of a^2 is exactly equal to the dimension of z^2.
+
+![](img/nn-math-3.png)
+
+Now, generalising the mathematical expression for the (l+1)-th hidden layer:
+
+![](img/nn-math-4.png)
+
+### Number of parameters
+
+s_0 = N inputs, including the bias associated with x_0 = 1; hence we have s_0+1 parameters. These are connected to s_1 = 2 nodes, which means that the parameters from the input layer to the first hidden layer is (s_0+1) x s_1 = (N+1) x 2. Following this pattern, the total number of parameters of the neural network is:
+
+![](img/nn-parameters.png)
+
+This example helps us generalise in a compact form:
+
+![](img/nn-parameters-2.png)
+
+### Forward propagation
+
+*Forward propagation* is the evaluation of the loss function. It is evaluated from input to output; the loss function is:
+
+![](img/nn-forward-prop.png)
+
+Because neural networks contain nonlinear functions and compositions of nonlinear functions, the loss functions are typically **non-convex**. Therefore, a local minimum is not necessarily a global minimum.
+
+![](img/nn-forward-prop-2.png)
+
+### Activation functions
+
+The output of a neural network depends on the activation functions *a*, which are the only nonlinear transformations of the features **x** of the network. There are a few options:
+
+![](img/nn-activation-func.png)
+
+1. **Rectified linear unit (ReLU)**. Easy to optimise, close to linear functions. The gradient is large whenever the unit is active (does not saturate). At the non-differentiable point z=0, the algorithm may return either the left or right derivative. Due to floating point errors, very unlikely to exactly hit z=0; no significant consequences on the training.
+2. **Sigmoid and hyperbolic tangent**. Unlike ReLU, saturates for large values of the input z. Sensitive to the input only close to z=0, makes gradient descent slow or difficult. Sigmoids tend to perform better than ReLU for small networks.
+3. **Softplus**. Smooth version of ReLU, rarely used. Better alternatives are leaky ReLU or parameteric ReLU.
+
+![](img/nn-activation-func-2.png)
+
+### Output layer
+
+The output layer performs a final transformation of the features to complete the task of the neural network. It can be:
+
+1. **Linear units**. Model outputs are continuous functions of the inputs; used in *regression*.
+2. **Sigmoid**. Good choice for *binary classification* {0,1}. It provides the probability that the features belong in class 1.
+3. **Softmax**. Good choice for *multi-class classification* {0..k}. Gives the probability that teh features belong in class *i*.
+
+![](img/nn-softmax.png)
+
+**One hot encoding**. The softmax will output an array of probabilities (one for each class) between 0 and 1. We can take the highest probability and set it to 1, the others 0, creating a categorical class label.
+
+## Backpropagation
+
+![](img/nn-backpropagation-3.png)
+
+Backpropagation is used to compute the gradient of the loss function. Doing naive gradient descent with millions of parameters is not efficient. Backpropagation bypasses this problem wiht the chain rule.
+
+### Generalisation
+
+The loss function is a function of the output layer, which is a function of the previous layer, so on and so forth up to the inputs. For simplicity, we do not consider the bias nodes. First, we express the loss function in terms of the previous layers:
+
+![](img/nn-backpropagation-1.png)
+
+Second, we calculate the gradient of the loss function with respect to the parameters, by differentiation:
+
+![](img/nn-backpropagation-2.png)
+
+Focusing on the last hidden layer (l = L) and the second last layer (l = L-1) analyse the gradient:
+
+![](img/nn-backpropagation-4.png)
+
+Backpropagation is an efficient way to calculate the gradient because it involves only multiplication operations as we can store the forward pass in memory.
+
+### Architecture design
+
+**Universal approximation theorem**: we can represent any continuous function (in a specified range) with a neural network. On the other hand, *learning* any continuous function depends on the network architecture. There are no universal rules, however there are several rules of thumb to guide trial and error.
+
+* **Layers**. Multi-layer networks are usually preferable to a wide shallow network. Using multi-layer networks can reduce the number of nodes and the generalisation error. For more complex problems, more hidden layers are required until you start overfitting the training set; but more training data will be needed.
+* **Nodes**. The same number of neurons in all hidden layers is often used to reduce the number of hyperparameters. Similar to layers, can increase gradually until the network overfits.
+* **Depth**. Even though the number of layers increases in deeper networks, the number of parameters required to approximate the same function greatly decreases, helping to machine to better generalise. More paths with less nodes; but also harder to train.
+* **Regularisation factor**. Start with \lambda=0. Monitor the validation error, and ramp it up until overfitting is eliminated.
+* **Practice**. Often simpler to choose a model with more layers and nodes than you actually need, and use early stopping and regularization to prevent overfitting.
+
+### Training
+
+1. **Initialise** parameters and biases to small random values. Set gradients to zero, \delta=0
+2. **Forward propagation**
+3. **Back propagation**
+4. **Update** parameters through gradient descent
+5. **Repeat** 2-4 until convergence
+
+To reduce overfitting, split the data into train, validation, and test sets.
+
+* **Shuffle** the data randomly
+* **Split** the data into train, validation, test sets.
+* **Train** the network on the training set. The algorithm will do forward and backward passes to find a good set of parameters
+* **Validate** the network at the end of each epoch. Evaluate the network and monitor error whether the network underfits, overfits or neither. Use information here to fine-tune hyperparameters (e.g. learning rate, momentum, architecture, batch size etc.)
+* **Take** the best performing network after validation
+* **Test** the validated model on the test set to find the generalisation error.
+
+Another common approahc is *k*-fold cross validation, where the data is split into *k* groups. For each group, take one as validation set and others as training sets. Train the model and evaluate it against the validation set; repeat for all folds, and select an average of the parameters. This is especially useful when training data is limited.
+
+Since the loss function is non-convex, a local minimum does not necessarily correspond to a global minimum. Secondly, the network might have a slow convergence rate if the learning rate is not well-tuned. Stochastic gradient descent only depends on the gradient at the previous step; wasting the gradient history.
+
+This gives rise to the **gradient descent with momentum**, which updates with parameter **\beta**:
+
+![](img/nn-grad-descent-momentum.png)
+
+With the Nesterov algorithm (above), we take a sample of the gradient ahead where the momentum is pointing. Other optimisers commonly used are:
+
+![](img/nn-grad-descent-optimisers.png)
+
+The Adam optimiser performs well on a large range of cases. For all optimisers, the learning-rate schedules (learning-rate decays) can improve the convergence rate. The learning rate can be gradually decreased over the epochs.

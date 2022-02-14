@@ -26,3 +26,8 @@ Assignment 1: Multivariate linear regression in MATLAB.
 3. Given the polynomial kernel, find `\phi` such that `K` = `\phi_x` . `\phi_y`. Assume that the vectors are two dimensional.
 
 Assignment 2: Kernel trick for SVMs in MATLAB.
+
+## Feedforward neural networks (Lecture 4)
+
+1. How many input paths from the input layer to node 7 (nodes per layer**layers)
+2. Learn tensorflow in python3
