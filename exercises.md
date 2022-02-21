@@ -31,3 +31,12 @@ Assignment 2: Kernel trick for SVMs in MATLAB.
 
 1. How many input paths from the input layer to node 7 (nodes per layer**layers)
 2. Learn tensorflow in python3
+
+### Tutorial
+
+1. How to use Tensorflow/Keras to make a basic classifier.
+
+## Convolutional neural networks (Lecture 5)
+
+1. How many parameters would the following CNN have with and without parameter sharing?
+2. Read about the following CNN architectures (AlexNet, GoogleNet, VGGNet, ResNet).

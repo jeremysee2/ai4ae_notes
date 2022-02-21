@@ -461,3 +461,63 @@ With the Nesterov algorithm (above), we take a sample of the gradient ahead wher
 ![](img/nn-grad-descent-optimisers.png)
 
 The Adam optimiser performs well on a large range of cases. For all optimisers, the learning-rate schedules (learning-rate decays) can improve the convergence rate. The learning rate can be gradually decreased over the epochs.
+
+## Lecture 5 (Convolutional Neural Network)
+
+Convolutional Neural Networks (CNNs) make the explicit assumption that the inputs are grid-like inputs, as opposed to one-dimensional arrays (in feedforward neural networks). Inspired by biology, each neuron is *activated* by different inputs. They are powerful machines that can approximate complicated functions that have spatial information.
+
+For grid-like inputs, feedforward neural networks are fully connected and hence will have an excessively large number of parameters. They do not scale well to grid like data, as they flatten the 2D data into 1D, losing spatial correlations in the data.
+
+CNNs exploit the grid structure of a data. Layers of a CNN have neurons arranged in three dimensions, *width, depth and height*.
+
+### Structure of a CNN
+
+* Convolutional layer, which includes the activation functions
+* Pooling layer
+* Fully-connected layer
+
+![](img/cnn-structure.png)
+
+A **filter** is a weighted average of the pixels of a receptive field, by dot-multiplying the filter matrix with the input grid. This operation is known is *convolution*. The 2D filter is known as the *kernel*. In 3D, it is known as the *filter* and 2D slices of it are the *kernel*.
+
+The **convolutional layer's** weights consist of a set of learnable filters. Each filter is spatially small along width and height, but fully extends the depth of the input volume. During the forward pass, we convolve each filter across the width and height of the input volume. This produces a 2D feature map that gives a filtered input at every spatial position. Each filter produces a separate 2D feature map; we stack them along the depth dimension and produce the output volume. Convolutional layers have the following properties:
+
+* **Local connectivity**. Each neuron connects to only a local region of the input volume; the spatial extent of this connectivity is a *hyperparameter* called the *receptive field* of the neuron.
+* **Spatial arrangement**. Three *hyperparameters* control the size of the output volume:
+  * **Depth** of the output volume is the number of filters we use. Each learns to look for a different feature in the input.
+  * **Stride** is the step the filter takes while sliding over the input.
+  * **Padding** adds numbers around the border of the input to control the spatial size of the output volume. Typically we use padding to exactly preserve the spatial size of the input volume, same width and height, adding zeros as padding,
+* **Parameter sharing**. Share parameters across the same feature map to regularise the problem.
+
+**Pooling layer** in-between successive convolutional layers in a CNN, to reduce the spatial size, reduces the number of parameters and computation to prevent overfitting. Typically, *maxpool* with a size 2x2 stride 2, downsamples by 75%.
+
+**Fully connected layer**, same as the feedforward neural networks. This is used to solve the classification/regression problem.
+
+![](img/cnn-architecture-example.png)
+
+### Example CNN Architecture
+
+Consider a simple CNN that takes 32x32x3 images to score into 10 categories for classification.
+
+**Input** \[32x32x3\], the raw pixel values in RGB.
+
+**Convolutional layer** \[32x32x12\]. Example, 12 filters, each compute a dot product in a small region of the input to extract a feature.
+
+**Activation layer** \[32x32x12\]. Typically, we choose a ReLU layer, which applies an elementwise ReLU activation function. This leaves the size unchanged, but introduces nonlinearity in the CNN. This is often included in the convolutional layer.
+
+**Pooling layer** \[16x16x12\]. Downsamples the convolution layer along the spatial dimensions (width, height) through apooling operation such as *max pooling*. This reduces the number of parameters, and some information in the data.
+
+**Fully-connected layer** \[1x1x10\]. This layer is a feedforward neural network, which compute the class scores for 10 classes. Each neuron in this layer will be connected to all the neurons in the previous volume.
+
+![](img/cnn-numbers.png)
+
+![](img/cnn-memory.png)
+
+### CNN Design
+
+* **Inputlayer**. The input layer that contains the image should be divisible by a power of 2.
+* **Filter, stride, padding**. Typical sizes are 3x3, 5x5 with tride 1 and padding to preserve the dimension of the convolutional layer. P=(F-1)/2 preserves input size.
+* **Pooling**. Max-pooling with 2x2 receptive fields (F=2) and stride 2 (S=2), discards exactly 75% of the activations in an input volume.
+* **Double the number of filters after each pooling**. A good starting point for the number of filters.
+* **Augment the data**. Regularisation technique to prevent overfitting. Increase the data size by adding variations of the training data; shift rotate resize contrast etc. Trains the model to be less sensitive to these transformations.
+* **Dropout**. Prevent overfitting. At every training step, *p*% of neurons (except output layer) are ignored during the training step. The hyperparameter *p* is called the *dropout rate*, typically set to 40-50% in CNN. After training, no neuron is dropped, all participate in the prediction.
