@@ -521,3 +521,81 @@ Consider a simple CNN that takes 32x32x3 images to score into 10 categories for 
 * **Double the number of filters after each pooling**. A good starting point for the number of filters.
 * **Augment the data**. Regularisation technique to prevent overfitting. Increase the data size by adding variations of the training data; shift rotate resize contrast etc. Trains the model to be less sensitive to these transformations.
 * **Dropout**. Prevent overfitting. At every training step, *p*% of neurons (except output layer) are ignored during the training step. The hyperparameter *p* is called the *dropout rate*, typically set to 40-50% in CNN. After training, no neuron is dropped, all participate in the prediction.
+
+## Lecture 6 (Sequence Modelling, Recurrent Neural Networks)
+
+Sequential data: points in the dataset are dependent on the position of other points in the dataset (speech recognition, music generation, sentiment classification, DNA sequence analysis, machine translation, video activity classification, name recognition).
+
+Feedforward neural networks:
+
+* Do not learn correlations in time; they interpolate
+* Have a large number of parameters
+* Needs the inpu
+* Have temporal correlations and different time scales, for example, trends, seasonality (long-term correlations), cyclicality etc
+* Have temporal patterns
+* Even if they can be chaotic (like turbulence), they still have patterns above
+
+Thus feedforward neural networks are not suitable for larger time series data.
+
+### Recurrent cell
+
+A cell that accounts for the activation of the previous hidden state, with connections that go backwards.
+
+![](img/recurrent-cell.png)
+
+* Cell = neuron in the recurrent neural networks' jargon
+* The parameters are shared across the time steps
+* The network stores information on the history/past through the hidden state, *a*
+* Time is not a feature. It is an index that contains the data order
+* As much as (almost) every function can be approximated by a feedforward neural network, (almost) very function with recurrences can be approximated by a recurrent neural network
+
+Backpropagation in time is similar:
+
+![](img/rnn-backpropagation.png)
+
+Due to the large number of multiplication steps in backpropagation with chain rule, there is a problem of exploding or vanishing gradient, depending on the numerical value of each gradient. As a remedy:
+
+* Use ReLU activation functions betcause they have an unbounded positive range
+* Use residual learning, in which skip connections carry information through deep layers, which mitigates the vanishing gradient
+* Or move to LSTMs, GRUs, reservoir computers
+* Clip the gradient (for exploding gradient only)
+
+### Long-short term memory units (LSTMs)
+
+![](img/LSTM-chart.png)
+
+The hidden state *h* contains the short memory, whereas the cell state *c* contains the long memory.
+
+The forget gate controls the parts of the cell state that are not important (sigma =~ 0), and are to be forgotten.
+The candidate state *g* is the main state (the only state of an RNN), tanh activation function.
+The input gate controls the parts of the candidate state that are important (sigma =~ 1), and are to be added to the cell state.
+The output gate *o* controls which part of the cell should be the short-term state (hidden state).
+
+![](img/LSTM-cell.png)
+
+Training is slower than recurrent cells alone, but mitigates the problem of vanishing and exploding gradients.
+
+* Work very well for many applications (e.g. time series forecasting)
+* Difficult to interpret
+* Training may take time
+
+### Gated recurrent units (GRUs)
+
+Conceputally same as LSTMs, but with lower complexity. In a GRU, both short and long term memories are stored in the hidden state.
+
+The update gate controls both the forget gate and the input gate. If the gate controller is 1, the forget is open and the input is closed.
+The reset gate controls which part of the previous state is kept.
+The candidate state contains past information.
+The hidden state contains both newly added information and past information.
+
+![](img/GRU-cell.png)
+
+* Work very well for many applications
+* Complexity between RNNs (simple) and LSTMs (least simple)
+* Difficult to interpret
+* Training may take time, but less than LSTM
+* Difficult to say GRU vs LSTM performance a priori.
+
+* Can think of the state *a* as the memory of the past
+* Can think of the state *x* as a nudge towards reality
+* The final state is a combination of the previous state and forcing
