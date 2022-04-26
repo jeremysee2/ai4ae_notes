@@ -599,3 +599,150 @@ The hidden state contains both newly added information and past information.
 * Can think of the state *a* as the memory of the past
 * Can think of the state *x* as a nudge towards reality
 * The final state is a combination of the previous state and forcing
+
+## Lecture 7 (Unsupervised learning, clustering)
+
+Unsupervised learning in which the training data is not labelled. This is used to find patterns within the data, to find *patterns* in data, *cluster* and *classify* new data, as well reduce the dimensionality of the problem by extracting the most important features. *Classifying* sets *predefined* classes in which to put the features in. *Clustering* groups the instances based on their similarity without class labels.
+
+### k-Means Clustering
+
+It is a heuristic algorithm, which breaks the problem down to simple problems and solves it iteratively, but may not lead to the optimal solution. To group *m* observations into *k* clusters. Each observation is placed in the cluster with the nearest mean, partioning the data space into Voronoi cells. Generally *k* is unknown and must be found.
+
+1. **Choose a metric (distance function)**. Quantitatively defines the notion of *similarity* by measuring the distance between points in the *feature space*.
+2. **Choose number of clusters,** *k*.
+3. **Choose the centroids**. These are the starting baricenters (means), \mu_j of the clusters, which represents the positions of the clusters.
+4. **Compute the distances** of each instance with respect to each centroid, for i=1..m and j=1..k, |x^i-\mu_j|^2
+5. **Assign each instance** x^i to the closest centroid, j.
+6. **Compute the baricenter** (mean) of each centroid, \mu_j = 1/N_j \sum x^j where N_j is the number of points x^j that belong in cluster j
+7. **Update centroid**. The new centroid is the baricenter from the previous instruction.
+8. **Compute the new distances** from the new centroids for each point.
+9. **Does the mean distance from the centroid change?** If so repeat 5-8, else stop.
+
+k-means can be treated as an optimisation problem, to maximise the distances between centroids while minimizing the distances of the instances from the centroids, solving:  
+
+![](img/k-means-optimization.png)
+
+Finding the general optimal solution is an NP-hard roblem. The k-means algorithm will converge to a solution, but not guaranteed to be the globally optimal solution. If the data has a clustered structure, the computational complexity of the k-means algorithm is linear with the number of instances m, number of clusters k, number of dimensions n. If the data does not have a clustered structure, the computational complexity can become exponential.
+
+However, because of *centroid initialization* and the *a-priori* choice of the number of clusters it may not converge to a globally optimal solution. It does not perform well when the clusters have varying sizes, different densities or nonspherical shapes.
+
+A good performance metric is the average mean-squared distance between each instance and the corresponding centroid, which is known as *inertia*.
+
+Some strategies to improve the solutions:
+
+* **Centroid initialization**. Pick a good initial condition to converge to a different local optmium. Try different initial centroids and pick the best results.
+* **Number of clusters**. Whereas inertia is a good metric for judging the improvement of a centroid initialization, it is not a good metric for judging the improvement of increasing the number of clusters. Plot the inertia as a function of number of clusters, and choose the number of clusters at the inflection point (elbow).
+* **Feature scaling**. Scale the input features before running k-means, or the clusters may be stretched. Scaling the features do not guarantee that all clusters will be spherical, but improves the clusters shapes for k-means toperform more effectively. Alternatively, use DBSCAN.
+
+### Density-based spatial clustering of applications with noise (DBSCAN)
+
+DBSCAN is a density-based rather than centroid-based data clustering algorithm. DBSCAN groups points that are closely-packed together, identifies points that are isolated in low-density regions as outliers.
+
+* **Choose a metric (distance function)** We choose the Euclidean distance in this lecture.
+* **Choose \eps** to define the concept of vicinity to other points. Choose N to define the number of points that are needed to classify a neighbourhood as high density
+* **Select** a new instance
+* **Count** how many instances are located a small distance \eps from it. If an instance has at least N instances in its \eps-neighbourhood, then it is a core instance. Otherwise, it is not a core region and return to previous step.
+* **Classify** as anomalies all instances that are not core instances and do not have a core instance in their neighbourhoods.
+
+The algorithm works well for problems that are characterised by densely populated regions separated by lower density regions.
+
+DBSCAN pros and cons:
+* Does not need to specify the number of clusters
+* Can find clusters with complicated shapes
+* Can classify instances as noise
+* Only requires two hyperparameters, \eps and N
+
+* Can misclassify border points that are reachable from multiple core clusters
+* Depends on the distance measure used to define the neighbourhood, just like k-means
+* Does not cluster effectively when there are large differences in densities
+* If the estimates on data scales and distances are not good, challenging to tune \eps
+
+### Hierarchical clustering
+
+Hierarchical clustering build a hierarchy of clusters and is *heuristic* and *greedy*, the results are visualised in *dendograms*.
+
+* **Bottom-up** also known as "agglomerative", in which each instance defines a cluster at iteration zero. The algorithm pairs and merges clusters which become larger at every iteration.
+* **Top-down** also known as "divisive" in which all clusters define a large cluster at iteration zero. The algorithm recursively splits the clusters down to smallest clusters.
+
+1. **Choose a metric (distance function)**. Use the Euclidean distance in this lecture.
+2. **Compute** the distances between all the instances for all points
+3. **Merge** the closest pair into a new cluster, which is located midway its original distances
+4. **Repeat** steps 1-2 with the remaining m-1 instances
+5. **Stop** when you have only one large cluster that contains all the instances
+
+The heuristic approach does not tell the optimal number of clusters, and the interpretation of the hierarchical structure depends on the context. There are methods that can help make a decision on the number of clusters, such as *silhouette plots*, *elbow methods*, *heights of the vertical lines of the dendograms (which represent the distances between the connected clusters)*.
+
+### Elliptic envelope for anomaly detection
+
+The Gaussian density is a good model for many quantities such as velocity of particles in an ideal gas, noise in a signal etc. The monovariate Gaussian distribution is as follows:
+
+![](img/monovariate-gaussian.png)
+
+where \mu is the mean, \sigma^2 is the variance, N is the normal distribution.
+
+A multivariate Gaussian distribution has a column vetor of random variables (features), that follows the Gaussian probability density function:
+
+![](img/multivariate-gaussian.png)
+
+The *Mahalanobis* distance (covariance weighted distance) is shown above. The inverse of the covariance matrix \Sum^-1 is known as the *precision* matrix.
+
+### Elliptic envelope algorithm
+
+To answer the question: Given a test point x^i, is it an outlier/anomaly? In the elliptic envelope, we assume they are Gaussian distributed. Second, we compute the centroid of the datapoints. Third, we compute the distance of the test point with respect to the mean of the distribution. Intuitively, the closer the test point, the more likely it belongs to the set, hence the more likely it is not an outlier. Thus, we need to measure the distance between a test point and a Gaussian distribution. Fourth, we need to way the distance with the precision matrix.
+
+The Mahalanobis distance is the distance of the test point from the center of mass divided by the width of the ellipsoid in the direction of the test point. If the distribution is non-spherical, the probaility of the test point depends both on the distance from the mean and the direction. In the direction of the short axis, the test point must be closer to the mean to be classified as a non-outlier. On the other hand, in the direction of the long axis, the test point need to move farther away from the mean to be classified as an outlier.
+
+Fifth, we are ready to substitute the weighted-distance in the Gaussian distribution to evaluate the probability that test point belongs in the dataset.
+
+1. **Assume** the datapoints to be Gaussian distributed.
+2. **Compute** the mean and covariance
+3. **Compute** the Mahalnobis distance D between a test point and the mean
+4. **Choose** the decision boundary between outliers and non-outliers c
+5. **If** D>c, the test point is an outlier, otherwise it is not. The decision boundary can be c=1 (which contains roughly the majority of Gaussian distributed datapoints)
+
+## Lecture 8 (Transfer learning, decision trees)
+
+### Transfer learning
+
+Transfer learning exploits a pre-trained similar model to:
+
+1. Accelerate the training
+2. Require significantly less training data
+3. Find a potentially good minimum from a good starting point
+
+The process is as follows:
+
+1. **Freeze** a number of layers N; whose parameters will not be updated by backpropagation
+2. **Modify** the output layer of the baseline network for it to have the correct number of outputs for the new task
+3. **Re-train** the output layer of the transferred network, and **re-validate** the model. Transfer learning works best when the inputs have similar low-level features
+4. If the results are satisfactory, stop. Else, **unfreeze** more hidden layers (from output layer backwards) for them to be retrained. The right number of layers to reuse is a *hyperparameter*
+
+Practically:
+
+1. If the input size is different, a preporcessing step to resize the input may be necessary
+2. The more similar the tasks, themore layers to reuse
+3. The more training data you have, the more layers you can afford to unfreeze
+4. Helpful to reduce the learning rate when you unfreeze reused layers, to avoid drastically changing their (supposedly) optimal parameters
+
+### Offline vs Online learning
+
+*Offline learning* is just batch learning, where it is trained on all available data and frozen, to be deployed to predict the target without further learning.
+*Online learning* is incremental learning, where the system is trained incrementally in mini-batches, or when data is received continuously, so it learns from incoming data as well. This saves memory by discarding old data, and is easily influenced by the *learning rate*. The higher the learning rate, the faster it adapts to new data, making it more sensitive to good/bad data. To reduce this risk, need to monitor your system closely and switch leraning off if detecting a drop in performance.
+
+### Decision Trees
+A decision tree uses conditional statements at each node to separate the dataset, until it has been appropriately classified. The tree is constructed in the learning process, node by node.
+
+1. Analyse all possible partitions
+2. Construct children nodes for the partition with minimum impurity (largest information gain / drop in entropy)
+
+Impurity measures the information gain (categorical data), and the Gini diversity index (numerical data).
+
+![](img/entropy-equation.png)
+
+Information gain is the decrease in entropy from the original dataset vs partitioning the dataset. The aim is to find the feature with the highest information gain.
+
+The Gini Impurity Criterion measures how often a randomly chosen element from the set is incorrectly lablled. A higher GI means a higher chance of misclassification. Split with the lowest weighted GI for the child trees (to achieve the largest reduction in GI - similar to entropy)
+
+![](img/gi-equation.png)
+
+Shallow trees tend to have less variance but higher bias (underfitting), deep trees tend to have lower bias but may have high variance (overfitting).

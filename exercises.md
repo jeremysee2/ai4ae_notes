@@ -40,3 +40,9 @@ Assignment 2: Kernel trick for SVMs in MATLAB.
 
 1. How many parameters would the following CNN have with and without parameter sharing?
 2. Read about the following CNN architectures (AlexNet, GoogleNet, VGGNet, ResNet).
+
+
+## Clustering (Lecture 7)
+
+1. Clustering interactive [website](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html)
+2. Gaussians interactive [website](https://distill.pub/2019/visual-exploration-gaussian-processes/)
