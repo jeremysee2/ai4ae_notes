@@ -393,7 +393,7 @@ The output layer performs a final transformation of the features to complete the
 
 1. **Linear units**. Model outputs are continuous functions of the inputs; used in *regression*.
 2. **Sigmoid**. Good choice for *binary classification* {0,1}. It provides the probability that the features belong in class 1.
-3. **Softmax**. Good choice for *multi-class classification* {0..k}. Gives the probability that teh features belong in class *i*.
+3. **Softmax**. Good choice for *multi-class classification* {0..k}. Gives the probability that the features belong in class *i*.
 
 ![](img/nn-softmax.png)
 
@@ -555,7 +555,7 @@ Backpropagation in time is similar:
 
 Due to the large number of multiplication steps in backpropagation with chain rule, there is a problem of exploding or vanishing gradient, depending on the numerical value of each gradient. As a remedy:
 
-* Use ReLU activation functions betcause they have an unbounded positive range
+* Use ReLU activation functions because they have an unbounded positive range
 * Use residual learning, in which skip connections carry information through deep layers, which mitigates the vanishing gradient
 * Or move to LSTMs, GRUs, reservoir computers
 * Clip the gradient (for exploding gradient only)
